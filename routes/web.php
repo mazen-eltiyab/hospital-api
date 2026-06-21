@@ -26,6 +26,11 @@ Route::resource('appointments', AppointmentController::class);
 Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
 Route::post('/settings', [SettingController::class, 'store'])->name('settings.store');
 
+Route::get('/clear', function () {
+    \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+    return 'Cache Cleared!';
+});
+
 Route::get('/migrate', function () {
     try {
         \Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--force' => true, '--seed' => true]);
