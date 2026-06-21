@@ -68,6 +68,8 @@ body {
 	overflow-x: hidden;
 	height: 100%;
 }
+
+
 h1,
 h2,
 h3,
@@ -728,9 +730,9 @@ textarea.form-control {
 }
 .logo span {
 	color: #fff;
-	font-size: 24px;
+	font-size: 240px;
 	font-weight: 500;
-	margin-left: 0px;
+	margin-left: 10px;
 }
 .header .navbar-nav .badge {
 	position: absolute;
@@ -4913,4 +4915,38 @@ blockquote p {
 		margin: 0 auto;
 		margin-bottom: 10px;
 	}
+}
+
+   /* ===== الألوان المتغيرة ===== */
+/* ===== تعريف اللون ===== */
+:root {
+    --navbar-bg: rgba(3, 8, 18, 0.92); /* 92% معتم، 8% شفافية (قليلة جداً) */
+}
+
+/* الشريط العلوي - غامق مع لمسة شفافة */
+.header, 
+.navbar, 
+.main-header, 
+[class*="bg-primary"] {
+    background-color: var(--navbar-bg) !important;
+    backdrop-filter: blur(4px);    /* تأثير زجاجي خفيف جداً */
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* القائمة الجانبية - استخدام الذهبي للتميز */
+.sidebar-menu li.active a, 
+.sidebar-menu li a:hover {
+    border-left-color: #C9A24D !important;
+    color: #C9A24D !important;
+}
+
+/* الأزرار الأساسية */
+.btn-primary {
+    background-color: #1a3d6d !important;
+    border-color: #1a3d6d !important;
+}
+
+.btn-primary:hover {
+    background-color: #C9A24D !important;
+    border-color: #C9A24D !important;
 }

@@ -72,7 +72,7 @@ class RatingController extends Controller
                     'stars' => $rating->stars,
                     'comment' => $rating->comment,
                     'created_at' => $rating->created_at->format('M d, Y'),
-                    'patient_name' => $rating->patient ? $rating->patient->first_name . ' ' . $rating->patient->last_name : 'Anonymous',
+                    'patient_name' => $rating->patient ? $rating->patient->firstname . ' ' . $rating->patient->lastname : 'Anonymous',
                     'patient_image' => $rating->patient && $rating->patient->avatar ? url('storage/' . $rating->patient->avatar) : null,
                 ];
             });
@@ -106,7 +106,7 @@ class RatingController extends Controller
                     'stars' => $rating->stars,
                     'comment' => $rating->comment,
                     'created_at' => $rating->created_at->format('M d, Y'),
-                    'patient_name' => $rating->patient ? $rating->patient->first_name . ' ' . $rating->patient->last_name : 'Anonymous',
+                    'patient_name' => $rating->patient ? $rating->patient->firstname . ' ' . $rating->patient->lastname : 'Anonymous',
                     'patient_image' => $rating->patient && $rating->patient->avatar ? url('storage/' . $rating->patient->avatar) : null,
                 ];
             });

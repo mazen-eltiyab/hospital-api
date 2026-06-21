@@ -34,15 +34,21 @@ class PrescriptionController extends Controller
             'doctor_id' => $doctor ? $doctor->id : null,
             'patient_id' => $request->patient_id,
             'notes' => $request->notes,
-            'image' => $imagePath ? url('storage/' . $imagePath) : null,
+            'image_path' => $imagePath ? url('storage/' . $imagePath) : null,
         ]);
 
         // إضافة إشعار للمريض
         DB::table('notifications')->insert([
-            'doctor_id' => $doctor ? $doctor->id : null,
-            'patient_id' => $request->patient_id,
-            'title' => 'روشتة جديدة',
-            'message' => 'لقد أرسل لك الدكتور ' . ($doctor ? $doctor->first_name : '') . ' روشتة طبية جديدة.',
+            'id' => \Illuminate\Support\Str::uuid()->toString(),
+            'type' => 'App\Notifications\NewPrescription',
+            'notifiable_type' => 'App\Models\Patient',
+            'notifiable_id' => $request->patient_id,
+            'data' => json_encode([
+                'title' => 'روشتة جديدة',
+                'message' => 'لقد أرسل لك الدكتور ' . ($doctor ? $doctor->firstname : '') . ' روشتة طبية جديدة.',
+                'doctor_id' => $doctor ? $doctor->id : null,
+                'doctor_name' => $doctor ? $doctor->firstname . ' ' . $doctor->lastname : 'Doctor',
+            ]),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -67,21 +73,37 @@ class PrescriptionController extends Controller
 
         $prescriptions = Prescription::where('patient_id', $patient->id)
             ->with('doctor')
-            ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($prescription) {
                 return [
-                    'id' => $prescription->id,
+                    'id' => 'p_' . $prescription->id,
                     'notes' => $prescription->notes,
-                    'image_url' => $prescription->image,
-                    'doctor_name' => $prescription->doctor ? 'Dr. ' . $prescription->doctor->first_name . ' ' . $prescription->doctor->last_name : 'Unknown Doctor',
+                    'image_url' => $prescription->image_path,
+                    'doctor_name' => $prescription->doctor ? 'Dr. ' . $prescription->doctor->firstname . ' ' . $prescription->doctor->lastname : 'Unknown Doctor',
                     'created_at' => $prescription->created_at->format('M d, Y h:i A'),
+                    'timestamp' => $prescription->created_at->timestamp,
                 ];
             });
 
+        $reports = \App\Models\MedicalReport::where('patient_id', $patient->id)
+            ->with('doctor')
+            ->get()
+            ->map(function ($report) {
+                return [
+                    'id' => 'r_' . $report->id,
+                    'notes' => $report->report_content,
+                    'image_url' => $report->file_path ? url('storage/' . $report->file_path) : null,
+                    'doctor_name' => $report->doctor ? 'Dr. ' . $report->doctor->firstname . ' ' . $report->doctor->lastname : 'Unknown Doctor',
+                    'created_at' => $report->created_at->format('M d, Y h:i A'),
+                    'timestamp' => $report->created_at->timestamp,
+                ];
+            });
+
+        $allData = $prescriptions->concat($reports)->sortByDesc('timestamp')->values()->all();
+
         return response()->json([
             'status' => 'success',
-            'data' => $prescriptions
+            'data' => $allData
         ]);
     }
 }

@@ -13,7 +13,7 @@ class DoctorController extends Controller
             return [
                 'id' => $doctor->id,
                 'user_id' => $doctor->id, // Fallback if user_id doesn't exist
-                'name' => trim($doctor->first_name . ' ' . $doctor->last_name),
+                'name' => trim($doctor->firstname . ' ' . $doctor->lastname),
                 'speciality' => $doctor->speciality ?? 'General Practitioner',
                 'experience' => $doctor->experience ?? rand(1, 15), // Mock if missing
                 'rating' => $doctor->rating ?? (4 + (rand(0, 10) / 10)), // Mock if missing

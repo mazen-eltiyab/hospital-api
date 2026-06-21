@@ -26,12 +26,14 @@ class AppointmentController extends Controller
         $patient = Patient::where('email', $user->email)->first();
 
         $appointment = Appointment::create([
-            'appointment_id' => 'APT-' . strtoupper(uniqid()),
             'doctor_id' => $request->doctor_id,
             'patient_id' => $patient ? $patient->id : null,
             'appointment_date' => $request->date,
-            'appointment_time' => $request->time,
-            'status' => 0, // Pending
+            'start_time' => $request->time,
+            'status' => 'Pending', // Mina uses string or integer? Let's use 'Pending' as we don't know yet, maybe 0.
+            'patient_name' => $patient ? trim($patient->firstname . ' ' . $patient->lastname) : 'Unknown',
+            'doctor_name' => Doctor::find($request->doctor_id)->firstname ?? 'Unknown',
+            'department' => 'General',
         ]);
 
         return response()->json([
@@ -53,13 +55,27 @@ class AppointmentController extends Controller
             return response()->json(['patients' => []]);
         }
 
-        // Fetch patients that have appointments with this doctor
-        $patients = Patient::whereHas('appointments', function ($query) use ($doctor) {
-            $query->where('doctor_id', $doctor->id);
-        })->get();
+        // Fetch appointments for this doctor with patient details
+        $appointments = Appointment::where('doctor_id', $doctor->id)
+            ->with('patient')
+            ->orderBy('appointment_date', 'asc')
+            ->orderBy('start_time', 'asc')
+            ->get()
+            ->map(function ($app) {
+                return [
+                    'id' => $app->patient_id, // Keep ID as patient ID for prescriptions
+                    'appointment_id' => $app->id,
+                    'first_name' => $app->patient ? $app->patient->firstname : $app->patient_name,
+                    'last_name' => $app->patient ? $app->patient->lastname : '',
+                    'avatar' => $app->patient ? $app->patient->avatar : null,
+                    'date' => $app->appointment_date,
+                    'time' => $app->start_time,
+                    'status' => $app->status === 'Confirmed' || $app->status === '1' ? 'Confirmed' : ($app->status === 'Done' ? 'Done' : 'Upcoming'),
+                ];
+            });
 
         return response()->json([
-            'patients' => $patients
+            'patients' => $appointments
         ]);
     }
 
@@ -84,18 +100,24 @@ class AppointmentController extends Controller
                     ->where('patient_id', $patient->id)
                     ->where('doctor_id', $app->doctor_id)
                     ->first();
+                // Calculate how many patients are ahead for the same doctor, on the same day, before this appointment's time
+                $patientsAhead = Appointment::where('doctor_id', $app->doctor_id)
+                    ->where('appointment_date', $app->appointment_date)
+                    ->where('start_time', '<', $app->start_time)
+                    ->count();
 
                 return [
                     'id' => $app->id,
-                    'doctor_name' => $app->doctor ? 'Dr. ' . $app->doctor->first_name . ' ' . $app->doctor->last_name : 'Unknown Doctor',
+                    'doctor_name' => $app->doctor ? 'Dr. ' . $app->doctor->firstname . ' ' . $app->doctor->lastname : 'Unknown Doctor',
                     'specialty' => $app->doctor ? $app->doctor->speciality : 'General',
                     'date' => $app->appointment_date,
-                    'time' => $app->appointment_time,
-                    'status' => $app->status == 1 ? 'CONFIRMED' : 'PENDING',
+                    'time' => $app->start_time,
+                    'status' => $app->status === 'Confirmed' || $app->status === 1 ? 'CONFIRMED' : 'PENDING',
                     'profile_image_url' => $app->doctor && $app->doctor->avatar ? (\Illuminate\Support\Str::startsWith($app->doctor->avatar, ['http://', 'https://']) ? $app->doctor->avatar : asset('storage/' . $app->doctor->avatar)) : null,
                     'doctorId' => $app->doctor_id,
                     'userRating' => $rating ? $rating->stars : null,
                     'userReview' => $rating ? $rating->comment : null,
+                    'patientsAhead' => $patientsAhead,
                 ];
             });
 

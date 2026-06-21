@@ -1,8 +1,0 @@
-<?php
-header('Content-Type: text/plain');
-$f = '../storage/logs/laravel.log';
-if (file_exists($f)) {
-    echo file_get_contents($f);
-} else {
-    echo 'No log file found.';
-}

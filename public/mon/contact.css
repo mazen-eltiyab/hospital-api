@@ -1,0 +1,339 @@
+/* التأثير الأساسي - hover أنيق واحترافي */
+.lang-btn {
+    background: transparent;
+    color: #c9a24d;
+    border: 1px solid #c9a24d;
+    padding: 6px 15px;
+    border-radius: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    flex-shrink: 0;
+    min-width: 100px;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1); /* منحنى حركة أنيق */
+}
+
+/* الـ hover الاحترافي يجمع بين:
+   1. خلفية ذهبية ونص أبيض
+   2. تكبير بسيط (scale)
+   3. ظل ناعم
+   4. تغيير لون الحدود إن أردت
+*/
+.lang-btn:hover {
+    background: #c9a24d;
+    color: #ffffff;
+    transform: scale(1.05);
+    box-shadow: 0 6px 14px rgba(201, 162, 77, 0.35);
+    border-color: #c9a24d;
+}
+
+/* إضافة تأثير نشاط عند الضغط (اختياري) */
+.lang-btn:active {
+    transform: scale(0.98);
+    transition: 0.05s;
+}
+
+
+    /* ========== فقط أنماط محتوى صفحة الاتصال (بدون أي أنماط للنافبار أو الفوتر) ========== */
+    :root {
+        --primary: #C9A24D;
+        --primary-dark: #1F2A44;
+        --dark: #1F2A44;
+        --light-bg: #f9fafb;
+        --text: #333333;
+        --text-muted: #6b7280;
+        --white: #ffffff;
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Hero Section */
+    .hero {
+        text-align: center;
+        padding: 60px 20px;
+        background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1353&q=80');
+        background-size: cover;
+        background-position: center;
+    }
+
+    .badge {
+        display: inline-block;
+        color: var(--primary);
+        border-bottom: 2px solid var(--primary);
+        font-size: 0.9rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        padding-bottom: 5px;
+    }
+
+    .hero h1 {
+        font-size: 2.8rem;
+        margin-bottom: 20px;
+        color: var(--dark);
+        line-height: 1.2;
+    }
+
+    .highlight {
+        color: var(--primary);
+    }
+
+    .hero p {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        max-width: 700px;
+        margin: 0 auto 30px;
+    }
+
+    /* Emergency Bar */
+    .emergency-bar {
+        background: #C9A24D;
+        color: var(--white);
+        text-align: center;
+        padding: 12px;
+        font-size: 0.9rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .emergency-bar i {
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+       
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-bottom: 60px;
+    }
+
+    .card {
+        background: var(--white);
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        transition: transform 0.3s, box-shadow 0.3s;
+        text-align: center;
+    }
+
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 20px rgba(201, 162, 77, 0.3);
+    }
+
+    .icon-box {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 1.5rem;
+        background: #1F2A44;
+        color: #C9A24D;
+    }
+
+    .card h3 {
+        margin-bottom: 15px;
+        color: var(--dark);
+    }
+
+    .card p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .main-content {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 40px;
+    }
+
+    @media (max-width: 992px) {
+        .main-content { grid-template-columns: 1fr; }
+    }
+
+    .contact-form {
+        background: var(--white);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+    /* نقوم بإخفاء القائمة تماماً في كل الأحوال ما لم يتم الضغط على الزر */
+    .nav-links {
+        display: none !important;
+    }
+    .nav-links.active {
+        display: flex !important;
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 70%;
+        max-width: 300px;
+        height: 100vh;
+        background: #1F2A44;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+        z-index: 1050;
+        box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+    }
+    /* عند التبديل إلى العربية، تفتح القائمة من اليسار */
+    body[dir="rtl"] .nav-links.active {
+        right: auto;
+        left: 0;
+    }
+    /* تحويل زر الهامبرغر إلى X */
+    .menu-toggle.is-active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .menu-toggle.is-active span:nth-child(2) { opacity: 0; }
+    .menu-toggle.is-active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+}
+    @media (max-width: 600px) {
+        .specialties-grid { grid-template-columns: repeat(2, 1fr); }
+        .accred-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+
+    
+
+    .input-group input,
+    .input-group select,
+    .input-group textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: #f9fafb;
+        transition: border-color 0.3s;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus,
+    .input-group textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .submit-btn {
+        width: 100%;
+        background: var(--primary);
+        color: var(--white);
+        padding: 15px;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 1rem;
+        margin-top: 10px;
+    }
+
+    .submit-btn:hover {
+        background: var(--primary-dark);
+    }
+
+    .map-mock {
+        height: 250px;
+        background: #e5e7eb;
+        border-radius: 15px;
+        position: relative;
+        margin-bottom: 30px;
+        overflow: hidden;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .map-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: var(--shadow-lg);
+        backdrop-filter: blur(5px);
+    }
+
+    .faq {
+        margin-top: 30px;
+    }
+
+    .faq-item {
+        background: var(--white);
+        padding: 18px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        cursor: pointer;
+        transition: all 0.3s;
+        border-left: 4px solid transparent;
+    }
+
+    .faq-item:hover {
+        border-left-color: var(--primary);
+    }
+
+    .faq-item.active {
+        background: #f0fdf4;
+        border-left-color: var(--primary);
+    }
+
+    .faq-question {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 600;
+    }
+
+    .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        margin-top: 10px;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+    }
+
+    .faq-item.active .faq-answer {
+        max-height: 200px;
+    }
+
+    body[dir="rtl"] .faq-item {
+        border-left: none;
+        border-right: 4px solid transparent;
+    }
+    body[dir="rtl"] .faq-item:hover,
+    body[dir="rtl"] .faq-item.active {
+        border-right-color: var(--primary);
+    }

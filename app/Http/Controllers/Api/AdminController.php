@@ -35,6 +35,7 @@ class AdminController extends Controller
             if ($user->role === 'doctor') {
                 $doc = Doctor::where('email', $user->email)->first();
                 if ($doc) {
+                    $extra['doctor_id'] = $doc->id;
                     $extra['phone'] = $doc->phone ?? '';
                     $extra['speciality'] = $doc->speciality ?? '';
                     $extra['doctor_rating'] = $doc->rating ?? 0.0;
@@ -78,7 +79,9 @@ class AdminController extends Controller
 
         if ($request->role === 'doctor') {
             Doctor::create([
-                'first_name' => $request->name,
+                'user_id' => $user->id,
+                'experience' => $request->experience ?? 0,
+                'firstname' => $request->name,
                 'username' => $request->name . rand(100, 999),
                 'email' => $request->email,
                 'password' => \Illuminate\Support\Facades\Hash::make($request->password),
@@ -90,15 +93,12 @@ class AdminController extends Controller
                 'avatar' => $profileImagePath,
             ]);
         } elseif ($request->role === 'patient') {
-            Patient::create([
-                'first_name' => $request->name,
-                'username' => $request->name . rand(100, 999),
-                'email' => $request->email,
-                'password' => \Illuminate\Support\Facades\Hash::make($request->password),
-                'status' => 1,
-                'phone' => $request->phone ?? null,
-                'avatar' => $profileImagePath,
-            ]);
+            $patient = Patient::where('user_id', $user->id)->first();
+            if ($patient) {
+                if ($request->phone) $patient->phone = $request->phone;
+                if ($profileImagePath) $patient->avatar = $profileImagePath;
+                $patient->save();
+            }
         }
 
         return response()->json([
@@ -147,7 +147,7 @@ class AdminController extends Controller
         if ($user->role === 'doctor') {
             $doctor = Doctor::where('email', $user->email)->first();
             if ($doctor) {
-                if ($request->name) $doctor->first_name = $request->name;
+                if ($request->name) $doctor->firstname = $request->name;
                 if ($request->email) $doctor->email = $request->email;
                 if ($request->has('speciality')) $doctor->speciality = $request->speciality;
                 if ($request->has('phone')) $doctor->phone = $request->phone;
@@ -157,7 +157,7 @@ class AdminController extends Controller
         } elseif ($user->role === 'patient') {
             $patient = Patient::where('email', $user->email)->first();
             if ($patient) {
-                if ($request->name) $patient->first_name = $request->name;
+                if ($request->name) $patient->firstname = $request->name;
                 if ($request->email) $patient->email = $request->email;
                 if ($request->has('phone')) $patient->phone = $request->phone;
                 if ($profileImagePath) $patient->avatar = $profileImagePath;
@@ -187,7 +187,7 @@ class AdminController extends Controller
         $doctor = Doctor::firstOrCreate(
             ['email' => $targetUser->email],
             [
-                'first_name' => $targetUser->name,
+                'firstname' => $targetUser->name,
                 'username' => $targetUser->name . rand(100, 999),
                 'password' => $targetUser->password,
                 'status' => 1,

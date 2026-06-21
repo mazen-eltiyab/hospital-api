@@ -22,10 +22,26 @@ class NotificationController extends Controller
             return response()->json(['notifications' => []]);
         }
 
-        $notifications = Notification::where('patient_id', $patient->id)
-            ->with('doctor')
+        $notifications = \Illuminate\Support\Facades\DB::table('notifications')
+            ->where('notifiable_id', $patient->id)
+            ->where('notifiable_type', 'App\Models\Patient')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($n) {
+                $data = json_decode($n->data, true);
+                return [
+                    'id' => $n->id,
+                    'title' => $data['title'] ?? 'إشعار',
+                    'message' => $data['message'] ?? '',
+                    'doctor_id' => $data['doctor_id'] ?? null,
+                    'doctor' => [
+                        'firstname' => $data['doctor_name'] ?? 'Doctor',
+                        'lastname' => ''
+                    ],
+                    'created_at' => $n->created_at,
+                    'is_read' => $n->read_at !== null,
+                ];
+            });
 
         return response()->json([
             'notifications' => $notifications
@@ -47,17 +63,29 @@ class NotificationController extends Controller
 
         $doctor = Doctor::where('email', $user->email)->first();
 
-        $notification = Notification::create([
-            'doctor_id' => $doctor ? $doctor->id : null,
-            'patient_id' => $request->patient_id,
-            'title' => $request->title,
-            'message' => $request->message,
-            'is_read' => false,
+        $id = \Illuminate\Support\Str::uuid()->toString();
+        \Illuminate\Support\Facades\DB::table('notifications')->insert([
+            'id' => $id,
+            'type' => 'App\Notifications\CustomNotification',
+            'notifiable_type' => 'App\Models\Patient',
+            'notifiable_id' => $request->patient_id,
+            'data' => json_encode([
+                'title' => $request->title,
+                'message' => $request->message,
+                'doctor_id' => $doctor ? $doctor->id : null,
+                'doctor_name' => $doctor ? $doctor->firstname . ' ' . $doctor->lastname : 'Doctor',
+            ]),
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         return response()->json([
             'message' => 'تم إرسال الإشعار بنجاح',
-            'notification' => $notification
+            'notification' => [
+                'id' => $id,
+                'title' => $request->title,
+                'message' => $request->message,
+            ]
         ]);
     }
 }

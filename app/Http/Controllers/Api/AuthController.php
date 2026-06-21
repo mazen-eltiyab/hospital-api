@@ -28,24 +28,19 @@ class AuthController extends Controller
             'role' => $request->role,
         ]);
 
-        // Create specific profile based on role
+        // Create specific profile based on role using Mina's schema
         if ($request->role === 'doctor') {
             Doctor::create([
-                'first_name' => $request->name,
-                'username' => $request->name . rand(100, 999),
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'status' => 1,
-            ]);
-        } elseif ($request->role === 'patient') {
-            Patient::create([
-                'first_name' => $request->name,
+                'user_id' => $user->id,
+                'experience' => $request->experience ?? 0,
+                'firstname' => $request->name,
                 'username' => $request->name . rand(100, 999),
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'status' => 1,
             ]);
         }
+        // Patient profile creation is handled automatically by User::booted() observer in User.php
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -151,7 +146,7 @@ class AuthController extends Controller
             $doctor = Doctor::where('email', $userModel->email)->first();
             if ($doctor) {
                 if ($request->has('name')) {
-                    $doctor->first_name = $request->name;
+                    $doctor->firstname = $request->name;
                 }
                 if ($request->has('phone')) {
                     $doctor->phone = $request->phone;
@@ -165,7 +160,7 @@ class AuthController extends Controller
             $patient = Patient::where('email', $userModel->email)->first();
             if ($patient) {
                 if ($request->has('name')) {
-                    $patient->first_name = $request->name;
+                    $patient->firstname = $request->name;
                 }
                 if ($request->has('phone')) {
                     $patient->phone = $request->phone;
@@ -184,5 +179,95 @@ class AuthController extends Controller
             'message' => 'تم تحديث الملف الشخصي بنجاح',
             'user' => $userModel
         ]);
+    }
+
+    public function updateLanguage(Request $request)
+    {
+        $request->validate([
+            'language' => 'required|in:ar,en',
+        ]);
+
+        $user = $request->user();
+        $userModel = User::find($user->id);
+        $userModel->preferred_language = $request->language;
+        $userModel->save();
+
+        return response()->json([
+            'message' => 'تم تحديث لغة التطبيق بنجاح',
+            'language' => $request->language
+        ]);
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email|exists:users,email']);
+
+        $otp = rand(100000, 999999);
+
+        \DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $request->email],
+            [
+                'token' => $otp,
+                'created_at' => now()
+            ]
+        );
+
+        // TODO: Send OTP via Email. Returning it in response for testing.
+        return response()->json([
+            'message' => 'تم إرسال رمز التحقق إلى بريدك الإلكتروني',
+            'test_otp' => $otp // Remove this in production
+        ]);
+    }
+
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'otp' => 'required|string|min:4'
+        ]);
+
+        $record = \DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->where('token', $request->otp)
+            ->first();
+
+        if (!$record) {
+            return response()->json(['message' => 'رمز التحقق غير صحيح أو منتهي الصلاحية'], 400);
+        }
+
+        return response()->json(['message' => 'رمز التحقق صحيح']);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'otp' => 'required|string|min:4',
+            'password' => 'required|string|min:6|confirmed'
+        ]);
+
+        $record = \DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->where('token', $request->otp)
+            ->first();
+
+        if (!$record) {
+            return response()->json(['message' => 'رمز التحقق غير صحيح أو منتهي الصلاحية'], 400);
+        }
+
+        $user = User::where('email', $request->email)->first();
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        // Update Doctor or Patient profile password as well
+        if ($user->role === 'doctor') {
+            Doctor::where('email', $user->email)->update(['password' => $user->password]);
+        } elseif ($user->role === 'patient') {
+            Patient::where('email', $user->email)->update(['password' => $user->password]);
+        }
+
+        \DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        return response()->json(['message' => 'تم إعادة تعيين كلمة المرور بنجاح']);
     }
 }

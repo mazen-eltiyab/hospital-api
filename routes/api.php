@@ -12,12 +12,20 @@ use App\Http\Controllers\Api\AppointmentController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 Route::post('/register/patient', [AuthController::class, 'register']); // For compatibility
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::post('/profile/update', [AuthController::class, 'updateProfile']);
+    // Language
+    Route::post('/update-language', [AuthController::class, 'updateLanguage']);
+    
+    // Chatbot
+    Route::post('/chatbot/message', [\App\Http\Controllers\ChatbotController::class, 'handleChat']);
     
     // Admin Routes
     Route::get('/admin/counts', [AdminController::class, 'counts']);
