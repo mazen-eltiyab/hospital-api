@@ -27,6 +27,10 @@ Route::get('/settings', [SettingController::class, 'index'])->name('settings.ind
 Route::post('/settings', [SettingController::class, 'store'])->name('settings.store');
 
 Route::get('/migrate', function () {
-    \Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--force' => true, '--seed' => true]);
-    return 'Database Migrated Successfully!';
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--force' => true, '--seed' => true]);
+        return 'Database Migrated Successfully!';
+    } catch (\Exception $e) {
+        return 'Error: ' . $e->getMessage();
+    }
 }); 
