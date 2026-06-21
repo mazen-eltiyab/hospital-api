@@ -85,6 +85,7 @@ class AdminController extends Controller
                 'username' => $request->name . rand(100, 999),
                 'email' => $request->email,
                 'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+                'gender' => 'Male',
                 'status' => 1,
                 'speciality' => $request->speciality ?? 'General Practitioner',
                 'rating' => $request->rating ?? 0.0,
