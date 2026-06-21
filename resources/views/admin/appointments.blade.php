@@ -73,7 +73,11 @@
                             </span>
                         </td>
                         <td>
-                            <span class="status-badge {{ strtolower($i->status) }}">
+                            <span class="status-badge {{ strtolower($i->status) }} change-status-btn" 
+                                  data-id="{{ $i->id }}"
+                                  data-current="{{ strtolower($i->status) }}"
+                                  style="cursor: pointer;"
+                                  title="Click to change status">
                                 {{ ucfirst($i->status) }}
                             </span>
                         </td>
@@ -128,6 +132,43 @@
                         Swal.fire('Error!', 'Something went wrong.', 'error');
                     }
                 });
+            }
+        });
+    });
+
+    $(document).on('click', '.change-status-btn', function() {
+        var badge = $(this);
+        var id = badge.data('id');
+        var currentStatus = badge.data('current');
+        
+        // Toggle logic
+        var newStatus = 'confirmed';
+        if (currentStatus === 'confirmed') newStatus = 'cancelled';
+        else if (currentStatus === 'cancelled') newStatus = 'pending';
+
+        $.ajax({
+            url: "{{ route('appointments.updateStatus') }}",
+            method: "POST",
+            data: { 
+                _token: "{{ csrf_token() }}",
+                id: id,
+                status: newStatus
+            },
+            success: function(response) {
+                badge.removeClass('pending confirmed cancelled').addClass(newStatus);
+                badge.text(newStatus.charAt(0).toUpperCase() + newStatus.slice(1));
+                badge.data('current', newStatus);
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Status changed to ' + newStatus,
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            },
+            error: function() {
+                Swal.fire('Error!', 'Could not update status.', 'error');
             }
         });
     });
