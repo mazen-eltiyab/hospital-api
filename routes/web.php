@@ -26,6 +26,12 @@ Route::resource('appointments', AppointmentController::class);
 Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
 Route::post('/settings', [SettingController::class, 'store'])->name('settings.store');
 
+Route::get('/debug', function () {
+    $logFile = storage_path('logs/laravel.log');
+    $log = file_exists($logFile) ? file_get_contents($logFile) : 'No log file found.';
+    return response("<pre>ENV Variables:\n" . print_r($_ENV, true) . "\n\nLogs:\n" . $log . "</pre>");
+});
+
 Route::get('/clear', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
     return 'Cache Cleared!';
