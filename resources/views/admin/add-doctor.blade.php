@@ -97,6 +97,15 @@
                             <input name="password_confirmation" class="form-control" type="password" required>
                         </div>
                     </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Gender <span class="text-danger">*</span></label>
+                            <select name="gender" class="form-control" required>
+                                <option value="Male" {{ old('gender') == 'Male' ? 'selected' : '' }}>Male (ذكر)</option>
+                                <option value="Female" {{ old('gender') == 'Female' ? 'selected' : '' }}>Female (أنثى)</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
 
