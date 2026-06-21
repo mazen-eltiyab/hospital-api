@@ -247,24 +247,31 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
-        if ($.fn.DataTable.isDataTable('.datatable')) {
-            $('.datatable').DataTable().destroy();
-        }
-        var table = $('.datatable').DataTable({
-            "bFilter": true,
-            "sDom": 'rt',
-            "paging": true,
-            "order": [],
-            "language": {
-                "search": "_INPUT_",
-                "searchPlaceholder": "Search..."
-            }
-        });
-
         $('#btn_search').on('click', function() {
-            table.columns(0).search($('#search_name').val().trim());
-            table.columns(3).search($('#search_phone').val().trim());
-            table.draw();
+            var nameFilter = $('#search_name').val().toLowerCase().trim();
+            var phoneFilter = $('#search_phone').val().toLowerCase().trim();
+
+            $('.custom-table tbody tr').each(function() {
+                // Column 1 is Name, Column 4 is Phone
+                var rowName = $(this).find('td:eq(0)').text().toLowerCase();
+                var rowPhone = $(this).find('td:eq(3)').text().toLowerCase();
+
+                var nameMatch = rowName.includes(nameFilter) || nameFilter === '';
+                var phoneMatch = rowPhone.includes(phoneFilter) || phoneFilter === '';
+
+                if (nameMatch && phoneMatch) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+        
+        // Optional: Trigger search when pressing Enter
+        $('#search_name, #search_phone').on('keypress', function(e) {
+            if (e.which == 13) {
+                $('#btn_search').click();
+            }
         });
     });
 </script>
