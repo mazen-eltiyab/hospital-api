@@ -601,6 +601,16 @@
 <div class="main-wrapper">
 
     <!-- ========== HEADER ========== -->
+    @php
+        $avatarPath = optional(Auth::user()->patient)->avatar;
+        if ($avatarPath) {
+            $avatarUrl = \Illuminate\Support\Str::startsWith($avatarPath, ['http://', 'https://']) 
+                ? $avatarPath 
+                : (\Illuminate\Support\Str::startsWith($avatarPath, 'profiles/') ? asset('storage/' . $avatarPath) : asset('assets/img/' . $avatarPath));
+        } else {
+            $avatarUrl = asset('assets/img/user.jpg');
+        }
+    @endphp
     <div class="header">
 
         <!-- Logo -->
@@ -667,7 +677,7 @@
                     <span class="user-img">
                         <img class="rounded-circle"
                              id="user-avatar-source"
-                             src="{{ optional(Auth::user()->patient)->avatar ? asset('assets/img/' . Auth::user()->patient->avatar) : asset('assets/img/user.jpg') }}"
+                             src="{{ $avatarUrl }}"
                              alt="{{ Auth::user()->name }}">
                         <span class="status online"></span>
                     </span>
@@ -677,7 +687,7 @@
                 <div class="dropdown-menu dropdown-menu-right">
 
                     <div class="dropdown-user-header">
-                        <img src="{{ optional(Auth::user()->patient)->avatar ? asset('assets/img/' . Auth::user()->patient->avatar) : asset('assets/img/user.jpg') }}"
+                        <img src="{{ $avatarUrl }}"
                              alt="{{ Auth::user()->name }}">
                         <div class="dropdown-user-info">
                             <p class="user-fullname">{{ Auth::user()->name }}</p>
