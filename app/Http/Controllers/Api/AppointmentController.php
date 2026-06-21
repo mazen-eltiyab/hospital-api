@@ -70,7 +70,7 @@ class AppointmentController extends Controller
                     'avatar' => $app->patient ? $app->patient->avatar : null,
                     'date' => $app->appointment_date,
                     'time' => $app->start_time,
-                    'status' => $app->status === 'Confirmed' || $app->status === '1' ? 'Confirmed' : ($app->status === 'Done' ? 'Done' : 'Upcoming'),
+                    'status' => strtolower($app->status) === 'confirmed' || strtolower($app->status) === 'completed' || $app->status === '1' || $app->status === 1 ? 'Confirmed' : (strtolower($app->status) === 'done' ? 'Done' : 'Upcoming'),
                 ];
             });
 
@@ -112,7 +112,7 @@ class AppointmentController extends Controller
                     'specialty' => $app->doctor ? $app->doctor->speciality : 'General',
                     'date' => $app->appointment_date,
                     'time' => $app->start_time,
-                    'status' => $app->status === 'Confirmed' || $app->status === 1 ? 'CONFIRMED' : 'PENDING',
+                    'status' => strtolower($app->status) === 'confirmed' || strtolower($app->status) === 'completed' || $app->status === 1 || $app->status === '1' ? 'CONFIRMED' : 'PENDING',
                     'profile_image_url' => $app->doctor && $app->doctor->avatar ? (\Illuminate\Support\Str::startsWith($app->doctor->avatar, ['http://', 'https://']) ? $app->doctor->avatar : asset('storage/' . $app->doctor->avatar)) : null,
                     'doctorId' => $app->doctor_id,
                     'userRating' => $rating ? $rating->stars : null,
