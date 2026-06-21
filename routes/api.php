@@ -17,6 +17,9 @@ Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 Route::post('/register/patient', [AuthController::class, 'register']); // For compatibility
 
+// Debug route
+Route::get('/doctors', [DoctorController::class, 'index']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
@@ -36,7 +39,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin/doctors/{id}/rating', [AdminController::class, 'updateDoctorRating']);
     
     // Doctor / Patient lists
-    Route::get('/doctors', [DoctorController::class, 'index']);
     Route::get('/patients', [PatientController::class, 'index']); // Or /my-patients
     Route::get('/my-patients', [AppointmentController::class, 'myPatients']); // Doctor fetches their patients
     
