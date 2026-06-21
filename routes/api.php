@@ -43,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Appointments
     Route::post('/appointments', [AppointmentController::class, 'store']); // Patient books an appointment
     Route::get('/my-appointments', [AppointmentController::class, 'myAppointments']); // Patient fetches their appointments
+    Route::post('/appointments/status', [AppointmentController::class, 'updateStatus']); // Doctor/Admin updates status
     
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index']);

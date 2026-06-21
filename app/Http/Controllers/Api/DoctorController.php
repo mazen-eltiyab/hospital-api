@@ -9,7 +9,7 @@ class DoctorController extends Controller
 {
     public function index()
     {
-        $doctors = Doctor::where('status', 1)->get()->map(function ($doctor) {
+        $doctors = Doctor::get()->map(function ($doctor) {
             return [
                 'id' => $doctor->id,
                 'user_id' => $doctor->id, // Fallback if user_id doesn't exist
