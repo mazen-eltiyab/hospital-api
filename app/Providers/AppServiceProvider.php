@@ -27,10 +27,17 @@ class AppServiceProvider extends ServiceProvider
 
         // هنا بنقول للارافيل ابعت المتغيرات دي تلقائياً لملف الماستر بتاع الأدمن
         View::composer('*', function ($view) {
-            $view->with([
-                'unreadCount'           => ContactMessage::where('is_read', false)->count(),
-                'notificationsMessages' => ContactMessage::where('is_read', false)->latest()->take(5)->get()
-            ]);
+            try {
+                $view->with([
+                    'unreadCount'           => ContactMessage::where('is_read', false)->count(),
+                    'notificationsMessages' => ContactMessage::where('is_read', false)->latest()->take(5)->get()
+                ]);
+            } catch (\Exception $e) {
+                $view->with([
+                    'unreadCount'           => 0,
+                    'notificationsMessages' => []
+                ]);
+            }
         });
     }
 }
