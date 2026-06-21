@@ -60,3 +60,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Admin explicitly updates rating
     Route::post('/admin/doctors/{id}/rating', [AdminController::class, 'updateDoctorRating']);
 });
+
+Route::get('/migrate', function () { try { \Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--force' => true, '--seed' => true]); return 'Database Migrated Successfully!'; } catch (\Exception $e) { return 'Error: ' . $e->getMessage(); } });
+
+Route::get('/debug', function () { return response('<pre>' . print_r(getenv(), true) . '</pre>'); });
