@@ -43,26 +43,30 @@ class MedicalReportController extends Controller
                     ];
                 });
 
-            $appPrescriptions = DB::table('prescriptions')
-                ->where('patient_id', $patient->id)
-                ->get()
-                ->map(function($p) {
-                    $filePath = null;
-                    if ($p->image_path) {
-                        // Extract relative path from full URL
-                        $parsed = parse_url($p->image_path, PHP_URL_PATH);
-                        $filePath = str_replace('/storage/', '', $parsed);
-                        $filePath = str_replace('storage/', '', $filePath);
-                    }
-                    return (object) [
-                        'id' => 'a_'.$p->id,
-                        'doctor_id' => $p->doctor_id,
-                        'report_content' => $p->notes,
-                        'file_path' => $filePath ? 'storage/'.$filePath : null,
-                        'created_at' => $p->created_at,
-                        'timestamp' => strtotime($p->created_at)
-                    ];
-                });
+            $appPrescriptions = collect();
+            
+            if (\Illuminate\Support\Facades\Schema::hasTable('prescriptions')) {
+                $appPrescriptions = DB::table('prescriptions')
+                    ->where('patient_id', $patient->id)
+                    ->get()
+                    ->map(function($p) {
+                        $filePath = null;
+                        if ($p->image_path) {
+                            // Extract relative path from full URL
+                            $parsed = parse_url($p->image_path, PHP_URL_PATH);
+                            $filePath = str_replace('/storage/', '', $parsed);
+                            $filePath = str_replace('storage/', '', $filePath);
+                        }
+                        return (object) [
+                            'id' => 'a_'.$p->id,
+                            'doctor_id' => $p->doctor_id,
+                            'report_content' => $p->notes ?? null,
+                            'file_path' => $filePath ? 'storage/'.$filePath : null,
+                            'created_at' => $p->created_at,
+                            'timestamp' => strtotime($p->created_at)
+                        ];
+                    });
+            }
 
             $reports = $webReports->concat($appPrescriptions)->sortByDesc('timestamp')->values();
         }
