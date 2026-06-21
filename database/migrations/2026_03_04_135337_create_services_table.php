@@ -14,11 +14,8 @@ return new class extends Migration
     Schema::create('services', function (Blueprint $table) {
         $table->id();
         $table->string('service_name'); // اسم الخدمة
-        $table->decimal('price', 8, 2);  // السعر
+        $table->decimal('price', 8, 2)->nullable()->default(0);  // السعر
         $table->string('status')->default('active'); // active or inactive
-        // الربط المباشر مع الدكتور (المستخدم)
-        $table->foreignId('doctor_id')->constrained('users')->onDelete('cascade');
-        
         $table->timestamps();
     });
 }
