@@ -266,7 +266,18 @@
 <body>
 <div class="main-wrapper">
 
-    <!-- HEADER -->
+    <!-- ========== HEADER ========== -->
+    @php
+        $doctor = \App\Models\Doctor::where('email', auth()->user()->email)->first();
+        $avatarPath = $doctor ? $doctor->avatar : null;
+        if ($avatarPath) {
+            $avatarUrl = \Illuminate\Support\Str::startsWith($avatarPath, ['http://', 'https://']) 
+                ? $avatarPath 
+                : (\Illuminate\Support\Str::startsWith($avatarPath, 'profiles/') ? asset('storage/' . $avatarPath) : asset('assets/img/' . $avatarPath));
+        } else {
+            $avatarUrl = asset('assets/img/user.jpg');
+        }
+    @endphp
     <div class="header">
         <div class="header-left">
             <a href="{{ url('/') }}" class="logo">
@@ -328,7 +339,7 @@
                     <span class="user-img">
                         @php $doctor = \App\Models\Doctor::where('email', auth()->user()->email)->first(); @endphp
                         <img class="rounded-circle"
-                             src="{{ $doctor && $doctor->avatar ? asset('assets/img/' . $doctor->avatar) : asset('assets/img/user.jpg') }}"
+                             src="{{ $avatarUrl }}"
                              alt="{{ Auth::user()->name }}">
                         <span class="status online"></span>
                     </span>
@@ -336,7 +347,7 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-right">
                     <div class="dropdown-user-header">
-                        <img src="{{ $doctor && $doctor->avatar ? asset('assets/img/' . $doctor->avatar) : asset('assets/img/user.jpg') }}"
+                        <img src="{{ $avatarUrl }}"
                              alt="{{ Auth::user()->name }}">
                         <div class="dropdown-user-info">
                             <p class="user-fullname">Dr. {{ Auth::user()->name }}</p>
