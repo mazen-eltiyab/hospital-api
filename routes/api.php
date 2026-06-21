@@ -1,0 +1,54 @@
+<?php
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\Api\DoctorController;
+use App\Http\Controllers\Api\PatientController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\PrescriptionController;
+use App\Http\Controllers\Api\AppointmentController;
+
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register/patient', [AuthController::class, 'register']); // For compatibility
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/profile', [AuthController::class, 'profile']);
+    Route::post('/profile/update', [AuthController::class, 'updateProfile']);
+    
+    // Admin Routes
+    Route::get('/admin/counts', [AdminController::class, 'counts']);
+    Route::get('/admin/users', [AdminController::class, 'users']);
+    Route::post('/admin/users', [AdminController::class, 'storeUser']);
+    Route::post('/admin/users/{id}', [AdminController::class, 'updateUser']);
+    Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser']);
+    Route::post('/admin/doctors/{id}/rating', [AdminController::class, 'updateDoctorRating']);
+    
+    // Doctor / Patient lists
+    Route::get('/doctors', [DoctorController::class, 'index']);
+    Route::get('/patients', [PatientController::class, 'index']); // Or /my-patients
+    Route::get('/my-patients', [AppointmentController::class, 'myPatients']); // Doctor fetches their patients
+    
+    // Appointments
+    Route::post('/appointments', [AppointmentController::class, 'store']); // Patient books an appointment
+    Route::get('/my-appointments', [AppointmentController::class, 'myAppointments']); // Patient fetches their appointments
+    
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications', [NotificationController::class, 'store']); // Doctor sends notification
+    
+    // Prescriptions
+    Route::post('/prescriptions', [PrescriptionController::class, 'store']);
+    Route::get('/my-prescriptions', [PrescriptionController::class, 'myPrescriptions']);
+
+    // Ratings
+    Route::post('/ratings', [\App\Http\Controllers\Api\RatingController::class, 'store']);
+    Route::get('/doctors/{id}/reviews', [\App\Http\Controllers\Api\RatingController::class, 'index']);
+    Route::get('/my-reviews', [\App\Http\Controllers\Api\RatingController::class, 'myReviews']);
+
+    // Admin explicitly updates rating
+    Route::post('/admin/doctors/{id}/rating', [AdminController::class, 'updateDoctorRating']);
+});
