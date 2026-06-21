@@ -117,7 +117,7 @@
                 </a>
                 <button type="submit" class="btn-save-service">
                     <i class="fas fa-check"></i> Save Service
-                </a>
+                </button>
             </div>
         </form>
     </div>
