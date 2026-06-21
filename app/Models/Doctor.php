@@ -28,7 +28,9 @@ class Doctor extends Model
         'phone', 
         'avatar', 
         'bio', 
-        'status'
+        'status',
+        'speciality',
+        'reviews_count'
     ];
 
     /**
