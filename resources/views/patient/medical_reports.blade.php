@@ -20,7 +20,15 @@
                         : $userDoc->name;
                 }
                 $filePath = $report->file_path ?? ($report->report_file ?? null);
-                $fileUrl = $filePath ? ( (strpos($filePath, 'assets') !== false) ? asset($filePath) : asset('assets/img/reports/' . $filePath) ) : null;
+                if ($filePath) {
+                    if (strpos($filePath, 'assets') !== false || strpos($filePath, 'storage') !== false) {
+                        $fileUrl = asset($filePath);
+                    } else {
+                        $fileUrl = asset('assets/img/reports/' . $filePath);
+                    }
+                } else {
+                    $fileUrl = null;
+                }
             @endphp
 
             <div class="report-summary-card">

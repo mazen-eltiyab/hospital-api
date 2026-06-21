@@ -352,4 +352,4 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
 
 Route::get('/clear', function () { \Illuminate\Support\Facades\Artisan::call('optimize:clear'); return 'Cache Cleared!'; });
-Route::get('/migrate', function () { try { \Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--force' => true, '--seed' => true]); return 'Database Migrated Successfully!'; } catch (\Exception $e) { return 'Error: ' . $e->getMessage(); } });
+Route::get('/migrate', function () { try { \Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--force' => true, '--seed' => true]); \Illuminate\Support\Facades\Artisan::call('storage:link'); return 'Database Migrated and Storage Linked Successfully!'; } catch (\Exception $e) { return 'Error: ' . $e->getMessage(); } });
