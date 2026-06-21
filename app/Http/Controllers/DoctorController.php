@@ -444,6 +444,19 @@ public function rateDoctor(Request $request, $id)
     $doctor->rating = number_format($newAverage, 1);
     $doctor->save();
 
+    // Create a Rating record so it appears in the Flutter app's "My Reviews"
+    $patient = null;
+    if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->role === 'patient') {
+        $patient = \App\Models\Patient::where('user_id', \Illuminate\Support\Facades\Auth::id())->first();
+    }
+
+    \App\Models\Rating::create([
+        'doctor_id' => $doctor->id,
+        'patient_id' => $patient ? $patient->id : null,
+        'stars' => $request->stars,
+        'comment' => 'Rated from website',
+    ]);
+
     return response()->json([
         'new_rating' => $doctor->rating
     ]);
