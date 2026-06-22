@@ -21,6 +21,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (file_exists(app()->getCachedConfigPath())) {
+            @unlink(app()->getCachedConfigPath());
+        }
+
         if (env('APP_ENV') !== 'local') {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
