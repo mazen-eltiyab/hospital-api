@@ -173,8 +173,10 @@ Route::get('/clear-cache', function () {
 
 Route::get('/debug-env', function () {
     return [
-        'GOOGLE_CLIENT_ID' => env('GOOGLE_CLIENT_ID', 'NOT_FOUND'),
-        'GOOGLE_REDIRECT_URL' => env('GOOGLE_REDIRECT_URL', 'NOT_FOUND'),
+        'GOOGLE_CLIENT_ID' => getenv('GOOGLE_CLIENT_ID'),
+        'GOOGLE_REDIRECT_URL' => getenv('GOOGLE_REDIRECT_URL'),
+        'GOOGLE_REDIRECT' => getenv('GOOGLE_REDIRECT'),
+        'all_env' => $_ENV,
     ];
 });
 
