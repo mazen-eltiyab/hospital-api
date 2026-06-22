@@ -171,12 +171,11 @@ Route::get('/clear-cache', function () {
     return 'Cache cleared!';
 });
 
-Route::get('/debug-env', function () {
+Route::get('/debug-config', function () {
     return [
-        'GOOGLE_CLIENT_ID' => getenv('GOOGLE_CLIENT_ID'),
-        'GOOGLE_REDIRECT_URL' => getenv('GOOGLE_REDIRECT_URL'),
-        'GOOGLE_REDIRECT' => getenv('GOOGLE_REDIRECT'),
-        'all_env' => $_ENV,
+        'google_config' => config('services.google'),
+        'db_config' => config('database.default'),
+        'db_conn' => config('database.connections.mysql.host'),
     ];
 });
 
