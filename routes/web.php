@@ -166,6 +166,11 @@ Route::get('/doc_add_appoiment', [AppointmentController::class, 'addAppointment'
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 
+Route::get('/clear-cache', function () {
+    Artisan::call('optimize:clear');
+    return 'Cache cleared!';
+});
+
 require __DIR__.'/auth.php';
 
 
