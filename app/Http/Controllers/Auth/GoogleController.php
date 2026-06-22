@@ -32,7 +32,7 @@ class GoogleController extends Controller
 
             Auth::login($user, true);
 
-            return redirect('/dashboard');
+            return redirect('/');
         } catch (\Exception $e) {
             return redirect('/login')->with('error', 'Login failed!');
         }
