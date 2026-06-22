@@ -20,6 +20,9 @@ Route::post('/register/patient', [AuthController::class, 'register']); // For co
 // Debug route
 Route::get('/doctors', [DoctorController::class, 'index']);
 
+// Contact Messages
+Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'storeApi']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);

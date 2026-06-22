@@ -35,9 +35,34 @@ class ContactController extends Controller
         ]);
 
         // حفظ البيانات المتأكدين منها في جدول قاعدة البيانات فوراً
-        ContactMessage::create($validatedData);
+        $contactMessage = ContactMessage::create($validatedData);
+
+        // Send notification to admins
+        $admins = \App\Models\User::where('role', 'admin')->get();
+        \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewContactMessage($contactMessage));
 
         // ارجع للمستخدم في نفس الصفحة وقوله "رسالتك وصلت بنجاح"
         return redirect()->back()->with('success', 'Thank you! Your message has been sent successfully.');
+    }
+
+    public function storeApi(Request $request)
+    {
+        $validatedData = $request->validate([
+            'name'       => 'required|string|max:255',
+            'email'      => 'required|email',
+            'phone'      => 'nullable|string',
+            'department' => 'nullable|string',
+            'message'    => 'required|string',
+        ]);
+
+        $contactMessage = ContactMessage::create($validatedData);
+
+        $admins = \App\Models\User::where('role', 'admin')->get();
+        \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewContactMessage($contactMessage));
+
+        return response()->json([
+            'message' => 'Your message has been sent successfully.',
+            'data' => $contactMessage
+        ], 201);
     }
 }

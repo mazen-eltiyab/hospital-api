@@ -13,6 +13,26 @@ class NotificationController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+        
+        if ($user->role === 'admin') {
+            $notifications = \Illuminate\Support\Facades\DB::table('notifications')
+                ->where('notifiable_id', $user->id)
+                ->where('notifiable_type', 'App\Models\User')
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(function ($n) {
+                    $data = json_decode($n->data, true);
+                    return [
+                        'id' => $n->id,
+                        'title' => $data['title'] ?? 'Notification',
+                        'message' => $data['message'] ?? '',
+                        'type' => $data['type'] ?? 'system',
+                        'date' => $n->created_at,
+                    ];
+                });
+            return response()->json(['notifications' => $notifications]);
+        }
+
         if ($user->role !== 'patient') {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
