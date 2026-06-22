@@ -26,6 +26,7 @@ class GoogleController extends Controller
                 [
                     'name' => $googleUser->getName(),
                     'password' => bcrypt(uniqid()), // كلمة مرور عشوائية
+                    'role' => 'patient', // Force role to patient
                 ]
             );
 
@@ -35,5 +36,36 @@ class GoogleController extends Controller
         } catch (\Exception $e) {
             return redirect('/login')->with('error', 'Login failed!');
         }
+    }
+
+    public function apiVerifyGoogle(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'name' => 'required|string',
+        ]);
+
+        $user = User::firstOrCreate(
+            ['email' => $request->email],
+            [
+                'name' => $request->name,
+                'password' => bcrypt(uniqid()), 
+                'role' => 'patient', 
+            ]
+        );
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Google login successful',
+            'access_token' => $token,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+            ]
+        ], 200);
     }
 }

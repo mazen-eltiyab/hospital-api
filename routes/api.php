@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\AppointmentController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/auth/google/verify', [\App\Http\Controllers\Auth\GoogleController::class, 'apiVerifyGoogle']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
