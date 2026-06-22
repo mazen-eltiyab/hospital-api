@@ -32,7 +32,13 @@ class GoogleController extends Controller
 
             Auth::login($user, true);
 
-            return redirect('/');
+            if ($user->role === 'admin') {
+                return redirect('/index-2');
+            } elseif ($user->role === 'doctor') {
+                return redirect('/doctor');
+            } else {
+                return redirect('/patient');
+            }
         } catch (\Exception $e) {
             return $e->getMessage() . ' - ' . $e->getLine() . ' - ' . $e->getFile();
         }
