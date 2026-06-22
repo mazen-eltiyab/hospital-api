@@ -65,50 +65,69 @@ class AdminController extends Controller
             'role' => 'required|in:admin,doctor,patient',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
-            'role' => $request->role,
-        ]);
+        try {
+            \Illuminate\Support\Facades\DB::beginTransaction();
 
-        $profileImagePath = null;
-        if ($request->hasFile('profile_image')) {
-            $profileImagePath = $request->file('profile_image')->store('profiles', 'public');
-        }
-
-        if ($request->role === 'doctor') {
-            // Split name into firstname/lastname
-            $nameParts = explode(' ', $request->name, 2);
-            Doctor::create([
-                'user_id'       => $user->id,
-                'experience'    => $request->experience ?? 0,
-                'firstname'     => $nameParts[0] ?? $request->name,
-                'lastname'      => $nameParts[1] ?? '',
-                'username'      => str_replace(' ', '_', strtolower($request->name)) . rand(100, 999),
-                'email'         => $request->email,
-                'password'      => \Illuminate\Support\Facades\Hash::make($request->password),
-                'gender'        => 'Male',
-                'status'        => 1,
-                'speciality'    => $request->speciality ?? 'General Practitioner',
-                'rating'        => $request->rating ?? 0.0,
-                'reviews_count' => $request->reviews_count ?? 0,
-                'phone'         => $request->phone ?? null,
-                'avatar'        => $profileImagePath ?? '', // prevent NOT NULL constraint error
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+                'role' => $request->role,
             ]);
-        } elseif ($request->role === 'patient') {
-            $patient = Patient::where('user_id', $user->id)->first();
-            if ($patient) {
-                if ($request->phone) $patient->phone = $request->phone;
-                if ($profileImagePath) $patient->avatar = $profileImagePath;
-                $patient->save();
-            }
-        }
 
-        return response()->json([
-            'message' => 'User created successfully',
-            'user' => $user,
-        ], 201);
+            $profileImagePath = null;
+            if ($request->hasFile('profile_image')) {
+                $profileImagePath = $request->file('profile_image')->store('profiles', 'public');
+            }
+
+            if ($request->role === 'doctor') {
+                // Split name into firstname/lastname
+                $nameParts = explode(' ', $request->name, 2);
+                Doctor::create([
+                    'user_id'       => $user->id,
+                    'experience'    => $request->experience ?? 0,
+                    'firstname'     => $nameParts[0] ?? $request->name,
+                    'lastname'      => $nameParts[1] ?? '',
+                    'username'      => str_replace(' ', '_', strtolower($request->name)) . rand(100, 999),
+                    'email'         => $request->email,
+                    'password'      => \Illuminate\Support\Facades\Hash::make($request->password),
+                    'gender'        => 'Male',
+                    'status'        => 1,
+                    'speciality'    => $request->speciality ?? 'General Practitioner',
+                    'rating'        => $request->rating ?? 0.0,
+                    'reviews_count' => $request->reviews_count ?? 0,
+                    'phone'         => $request->phone ?? null,
+                    'avatar'        => $profileImagePath ?? '', // prevent NOT NULL constraint error
+                ]);
+            } elseif ($request->role === 'patient') {
+                $patient = Patient::where('user_id', $user->id)->first();
+                if (!$patient) {
+                    // Split name into firstname/lastname
+                    $nameParts = explode(' ', $request->name, 2);
+                    Patient::create([
+                        'user_id'       => $user->id,
+                        'firstname'     => $nameParts[0] ?? $request->name,
+                        'lastname'      => $nameParts[1] ?? '',
+                        'email'         => $request->email,
+                        'password'      => \Illuminate\Support\Facades\Hash::make($request->password),
+                        'phone'         => $request->phone ?? null,
+                    ]);
+                }
+            }
+
+            \Illuminate\Support\Facades\DB::commit();
+
+            return response()->json([
+                'message' => 'User created successfully',
+                'user' => $user
+            ], 201);
+            
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            return response()->json([
+                'message' => 'Error creating user: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function deleteUser($id)
