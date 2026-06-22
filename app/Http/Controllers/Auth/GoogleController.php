@@ -34,7 +34,7 @@ class GoogleController extends Controller
 
             return redirect('/');
         } catch (\Exception $e) {
-            return redirect('/login')->with('error', 'Login failed!');
+            return $e->getMessage() . ' - ' . $e->getLine() . ' - ' . $e->getFile();
         }
     }
 
