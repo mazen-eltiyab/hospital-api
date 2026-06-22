@@ -75,4 +75,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::get('/migrate', function () { try { \Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--force' => true, '--seed' => true]); return 'Database Migrated Successfully!'; } catch (\Exception $e) { return 'Error: ' . $e->getMessage(); } });
 
+Route::post('/import-friend-data', [\App\Http\Controllers\Api\AdminController::class, 'importFriendData']);
 Route::get('/debug', function () { return response('<pre>' . print_r(getenv(), true) . '</pre>'); });
