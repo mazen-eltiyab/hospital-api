@@ -171,6 +171,13 @@ Route::get('/clear-cache', function () {
     return 'Cache cleared!';
 });
 
+Route::get('/debug-env', function () {
+    return [
+        'GOOGLE_CLIENT_ID' => env('GOOGLE_CLIENT_ID', 'NOT_FOUND'),
+        'GOOGLE_REDIRECT_URL' => env('GOOGLE_REDIRECT_URL', 'NOT_FOUND'),
+    ];
+});
+
 require __DIR__.'/auth.php';
 
 
