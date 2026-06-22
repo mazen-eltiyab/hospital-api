@@ -45,6 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admin/users/{id}', [AdminController::class, 'updateUser']);
     Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser']);
     Route::post('/admin/doctors/{id}/rating', [AdminController::class, 'updateDoctorRating']);
+    Route::get('/admin/contacts', [\App\Http\Controllers\ContactController::class, 'indexApi']);
     
     // Doctor / Patient lists
     Route::get('/patients', [PatientController::class, 'index']); // Or /my-patients

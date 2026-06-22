@@ -78,20 +78,23 @@ class AdminController extends Controller
         }
 
         if ($request->role === 'doctor') {
+            // Split name into firstname/lastname
+            $nameParts = explode(' ', $request->name, 2);
             Doctor::create([
-                'user_id' => $user->id,
-                'experience' => $request->experience ?? 0,
-                'firstname' => $request->name,
-                'username' => $request->name . rand(100, 999),
-                'email' => $request->email,
-                'password' => \Illuminate\Support\Facades\Hash::make($request->password),
-                'gender' => 'Male',
-                'status' => 1,
-                'speciality' => $request->speciality ?? 'General Practitioner',
-                'rating' => $request->rating ?? 0.0,
+                'user_id'       => $user->id,
+                'experience'    => $request->experience ?? 0,
+                'firstname'     => $nameParts[0] ?? $request->name,
+                'lastname'      => $nameParts[1] ?? '',
+                'username'      => str_replace(' ', '_', strtolower($request->name)) . rand(100, 999),
+                'email'         => $request->email,
+                'password'      => \Illuminate\Support\Facades\Hash::make($request->password),
+                'gender'        => 'Male',
+                'status'        => 1,
+                'speciality'    => $request->speciality ?? 'General Practitioner',
+                'rating'        => $request->rating ?? 0.0,
                 'reviews_count' => $request->reviews_count ?? 0,
-                'phone' => $request->phone ?? null,
-                'avatar' => $profileImagePath,
+                'phone'         => $request->phone ?? null,
+                'avatar'        => $profileImagePath ?? '', // prevent NOT NULL constraint error
             ]);
         } elseif ($request->role === 'patient') {
             $patient = Patient::where('user_id', $user->id)->first();

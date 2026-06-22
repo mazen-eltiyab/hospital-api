@@ -19,21 +19,53 @@ class AppointmentController extends Controller
         ]);
 
         $user = $request->user();
-        if ($user->role !== 'patient') {
+        if ($user->role !== 'patient' && $user->role !== 'admin') {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $patient = Patient::where('email', $user->email)->first();
+        if ($user->role === 'admin') {
+            // Admin can pass patient_id (from patients table) or user_id (from users table)
+            $patient = null;
+            if ($request->filled('patient_id')) {
+                // Try to find by patients.id directly
+                $patient = Patient::find($request->patient_id);
+                if (!$patient) {
+                    // Try to find by user_id (users table id)
+                    $patientUser = \App\Models\User::find($request->patient_id);
+                    if ($patientUser) {
+                        $patient = Patient::where('email', $patientUser->email)->first();
+                        if (!$patient) {
+                            // Create patient record linked to this user
+                            $nameParts = explode(' ', $patientUser->name, 2);
+                            $patient = Patient::create([
+                                'user_id'   => $patientUser->id,
+                                'firstname' => $nameParts[0] ?? $patientUser->name,
+                                'lastname'  => $nameParts[1] ?? '',
+                                'email'     => $patientUser->email,
+                                'avatar'    => '',
+                            ]);
+                        }
+                    }
+                }
+            }
+            if (!$patient) {
+                return response()->json(['message' => 'Patient not found'], 422);
+            }
+        } else {
+            $patient = Patient::where('email', $user->email)->first();
+        }
+
+        $doctor = Doctor::find($request->doctor_id);
 
         $appointment = Appointment::create([
-            'doctor_id' => $request->doctor_id,
-            'patient_id' => $patient ? $patient->id : null,
+            'doctor_id'        => $request->doctor_id,
+            'patient_id'       => $patient ? $patient->id : null,
             'appointment_date' => $request->date,
-            'start_time' => $request->time,
-            'status' => 'Pending', // Mina uses string or integer? Let's use 'Pending' as we don't know yet, maybe 0.
-            'patient_name' => $patient ? trim($patient->firstname . ' ' . $patient->lastname) : 'Unknown',
-            'doctor_name' => Doctor::find($request->doctor_id)->firstname ?? 'Unknown',
-            'department' => 'General',
+            'start_time'       => $request->time,
+            'status'           => 'Pending',
+            'patient_name'     => $patient ? trim($patient->firstname . ' ' . $patient->lastname) : 'Unknown',
+            'doctor_name'      => $doctor ? trim($doctor->firstname . ' ' . ($doctor->lastname ?? '')) : 'Unknown',
+            'department'       => $doctor ? ($doctor->speciality ?? 'General') : 'General',
         ]);
 
         return response()->json([

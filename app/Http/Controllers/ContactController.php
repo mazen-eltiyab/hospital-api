@@ -20,6 +20,12 @@ class ContactController extends Controller
         return view('frontend.contact', compact('services')); 
     }
 
+    public function indexApi()
+    {
+        $messages = ContactMessage::orderBy('created_at', 'desc')->get();
+        return response()->json(['messages' => $messages]);
+    }
+
     /**
      * 2. دالة استقبال بيانات الفورم وحفظها في قاعدة البيانات
      */
