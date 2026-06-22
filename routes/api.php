@@ -23,6 +23,10 @@ Route::get('/doctors', [DoctorController::class, 'index']);
 // Contact Messages
 Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'storeApi']);
 
+// Departments
+Route::get('/departments', [\App\Http\Controllers\DepartmentController::class, 'index']);
+Route::post('/departments', [\App\Http\Controllers\DepartmentController::class, 'store']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
