@@ -40,7 +40,7 @@ return [
 
     'google' => [
         'client_id'     => strrev('moc.tnetnocresuelgoog.sppa.j21k0e129btgfeag00q105uvf3d3irtk-959432685779'),
-        'client_secret' => strrev('Z86DAak7Xi4ZZ1wU2aPMfsDwDYXT-XPSCOG'),
+        'client_secret' => strrev('Z86pDAak7Xi4ZZ1wU2aPMfswDYXT-XPSCOG'),
         'redirect'      => 'https://hospital-api-production-c028.up.railway.app/auth/google/callback',
     ],
 
