@@ -12,14 +12,14 @@ class GoogleController extends Controller
     // خطوة 1: تحويل المستخدم لـ Google
     public function redirectToGoogle()
     {
-        return Socialite::driver('google')->redirect();
+        return Socialite::driver('google')->stateless()->redirect();
     }
 
     // خطوة 2: استقبال البيانات من Google
     public function handleGoogleCallback()
     {
         try {
-            $googleUser = Socialite::driver('google')->user();
+            $googleUser = Socialite::driver('google')->stateless()->user();
 
             $user = User::firstOrCreate(
                 ['email' => $googleUser->getEmail()],
